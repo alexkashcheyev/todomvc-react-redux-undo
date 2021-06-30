@@ -6,7 +6,7 @@ import { getCompletedTodoCount } from '../selectors'
 
 
 const mapStateToProps = state => ({
-  todosCount: state.todos.length,
+  todosCount: state.todos.present.length,
   completedCount: getCompletedTodoCount(state)
 })
 

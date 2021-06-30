@@ -5,7 +5,9 @@ import TodoTextInput from '../components/TodoTextInput'
 
 const setup = () => {
   const props = {
-    addTodo: jest.fn()
+    addTodo: jest.fn(),
+    undo: jest.fn(),
+    redo: jest.fn()
   }
 
   const renderer = createRenderer();
@@ -41,6 +43,26 @@ describe('components', () => {
       expect(props.addTodo).not.toBeCalled()
       input.props.onSave('Use Redux')
       expect(props.addTodo).toBeCalled()
+    })
+
+    it('should call undo on click on undo button', () => {
+      const { output, props } = setup()
+      const [ , , container ] = output.props.children
+      const [ undo ] = container.props.children
+
+      undo.props.onClick()
+
+      expect(props.undo).toBeCalled()
+    })
+
+    it('should call redo on click on redo button', () => {
+      const { output, props } = setup()
+      const [ , , container ] = output.props.children
+      const [ , redo ] = container.props.children
+
+      redo.props.onClick()
+
+      expect(props.redo).toBeCalled()
     })
   })
 })

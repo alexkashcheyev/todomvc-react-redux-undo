@@ -11,7 +11,7 @@ const undoRedoIconsContainerStyle = {
   cursor: "pointer"
 };
 
-const Header = ({ addTodo }) => (
+const Header = ({ addTodo, undo, redo }) => (
   <header className="header">
     <h1>todos</h1>
     <TodoTextInput
@@ -24,8 +24,8 @@ const Header = ({ addTodo }) => (
       placeholder="What needs to be done?"
     />
     <div style={undoRedoIconsContainerStyle}>
-      <UndoRedoIcon undo onClick={() => alert("Undo not implemented")} />
-      <UndoRedoIcon redo onClick={() => alert("Redo not implemented")} />
+      <UndoRedoIcon undo onClick={() => undo()} />
+      <UndoRedoIcon redo onClick={() => redo()} />
     </div>
   </header>
 );

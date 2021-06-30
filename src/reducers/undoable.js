@@ -1,6 +1,6 @@
 import * as types from '../constants/ActionTypes'
 
-export function undoable(reducer, ignoredActionTypes = []) {
+export default function undoable(reducer, acceptedActionTypes = []) {
   const initialState = {
     past: [],
     present: reducer(undefined, {}),
@@ -39,16 +39,16 @@ export function undoable(reducer, ignoredActionTypes = []) {
         }
 
       default:
-        const newPresent = reducer(state, action)
-
-        if (ignoredActionTypes.includes(action.type)) {
+        const newPresent = reducer(state.present, action)
+        if (acceptedActionTypes.includes(action.type)) {
           return {
-            ...state,
-            present: reducer(state, action)
+            past: [...state.past, state.present],
+            present: newPresent,
+            future: []
           }
         } else {
           return {
-            past: [...state.past, state.present],
+            past: [],
             present: newPresent,
             future: []
           }

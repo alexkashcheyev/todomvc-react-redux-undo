@@ -1,4 +1,4 @@
-import { undoable } from './undoable';
+import undoable from './undoable';
 import { Chance } from 'chance';
 import * as actions from '../actions'
 
@@ -37,11 +37,11 @@ function setup(
     type: 'UNKNOWN'
   }
 
-  const ignoredAction = {
+  const acceptedAction = {
     type: 'IGNORED'
   }
 
-  const ignoredActionTypes = [ignoredAction.type];
+  const acceptedActionTypes = [acceptedAction.type];
 
   return {
     originalReducer,
@@ -51,8 +51,8 @@ function setup(
     stateWithFuture,
     stateWithPast,
     unknownAction,
-    ignoredAction,
-    ignoredActionTypes
+    acceptedAction,
+    acceptedActionTypes
   }
 }
 
@@ -69,55 +69,43 @@ describe('undoable higher order reducer', () => {
 
   })
 
-  describe('on ignored action', () => {
+  describe('on accepted action', () => {
     it('should call the original reducer', () => {
-      const { originalReducer, ignoredActionTypes, stateWithHistory, ignoredAction } = setup()
+      const { originalReducer, acceptedActionTypes, stateWithHistory, acceptedAction } = setup()
 
-      undoable(originalReducer, ignoredActionTypes)(stateWithHistory, ignoredAction)
+      undoable(originalReducer, acceptedActionTypes)(stateWithHistory, acceptedAction)
       
       expect(originalReducer).toHaveBeenCalled()
     })
 
-    it('should not change undo queue', () => {
-      const { originalReducer, ignoredActionTypes, stateWithHistory, ignoredAction} = setup()
+    it('should change undo queue', () => {
+      const { originalReducer, acceptedActionTypes, stateWithHistory, acceptedAction} = setup()
 
       expect(
-        undoable(originalReducer, ignoredActionTypes)(stateWithHistory, ignoredAction).past
-      ).toEqual(stateWithHistory.past)
+        undoable(originalReducer, acceptedActionTypes)(stateWithHistory, acceptedAction).past
+      ).toContainEqual(stateWithHistory.present)
     })
 
-    it('should not change redo queue', () => {
-      const { originalReducer, ignoredActionTypes, stateWithHistory, ignoredAction} = setup()
+    it('should clear redo queue', () => {
+      const { originalReducer, acceptedActionTypes, stateWithHistory, acceptedAction} = setup()
 
       expect(
-        undoable(originalReducer, ignoredActionTypes)(stateWithHistory, ignoredAction).future
-      ).toEqual(stateWithHistory.future)
+        undoable(originalReducer, acceptedActionTypes)(stateWithHistory, acceptedAction).future
+      ).toEqual([])
     })
   })
 
   describe('on unknown action', () => {
-    it('should clear the redo queue', () => {
-      const { originalReducer, stateWithFuture, unknownAction } = setup()
+    it('should clear undo queue', () => {
+      const { originalReducer, stateWithHistory, unknownAction } = setup()
 
-      expect(undoable(originalReducer)(stateWithFuture, unknownAction).future).toEqual([])
+      expect(undoable(originalReducer)(stateWithHistory, unknownAction).past).toEqual([])
     })
 
-    it('should add current value to undo queue', () => {
-      const { originalReducer, stateWithoutHistory, unknownAction } = setup()
+    it('should clear redo queue', () => {
+      const { originalReducer, stateWithHistory, unknownAction } = setup()
 
-      expect(
-        undoable(originalReducer)(stateWithoutHistory, unknownAction).past
-      ).toContainEqual(stateWithoutHistory.present)
-    })
-
-    it('should call the original reducer', () => {
-      const { originalReducer, result, stateWithHistory, unknownAction } = setup()
-
-      expect(
-        undoable(originalReducer)(stateWithHistory, unknownAction).present
-      ).toEqual(result)
-
-      expect(originalReducer).toHaveBeenCalled()
+      expect(undoable(originalReducer)(stateWithHistory, unknownAction).future).toEqual([])
     })
   })
 
