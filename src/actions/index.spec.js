@@ -42,4 +42,16 @@ describe('todo actions', () => {
       type: types.CLEAR_COMPLETED
     })
   })
+
+  it('undo should create UNDO action', () => {
+    expect(actions.undo()).toEqual({
+      type: types.UNDO
+    })
+  })
+
+  it('redo should create REDO action', () => {
+    expect(actions.redo()).toEqual({
+      type: types.REDO
+    })
+  })
 })
